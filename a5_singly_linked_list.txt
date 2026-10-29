@@ -1,0 +1,165 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct node {
+    long prn;
+    char name[30];
+    struct node *next;
+};
+
+struct node *head = NULL;
+
+struct node *create() {
+    struct node *n = malloc(sizeof(struct node));
+
+    printf("Enter PRN and name: ");
+    scanf("%ld %29s", &n->prn, n->name);
+
+    n->next = NULL;
+    return n;
+}
+
+void addPresident() {
+    struct node *n = create();
+    n->next = head;
+    head = n;
+}
+
+void addSecretary() {
+    struct node *n = create();
+    struct node *t = head;
+
+    if (head == NULL) {
+        head = n;
+        return;
+    }
+
+    while (t->next != NULL)
+        t = t->next;
+
+    t->next = n;
+}
+
+void addMember() {
+    struct node *n = create();
+
+    if (head == NULL) {
+        head = n;
+        return;
+    }
+
+    n->next = head->next;
+    head->next = n;
+}
+
+void display() {
+    struct node *t = head;
+
+    if (t == NULL)
+        printf("List is empty\n");
+
+    while (t != NULL) {
+        printf("%ld %s\n", t->prn, t->name);
+        t = t->next;
+    }
+}
+
+void count() {
+    struct node *t = head;
+    int c = 0;
+
+    while (t != NULL) {
+        c++;
+        t = t->next;
+    }
+
+    printf("Total members: %d\n", c);
+}
+
+void deleteNode() {
+    struct node *t = head, *prev = NULL;
+    long p;
+
+    printf("Enter PRN to delete: ");
+    scanf("%ld", &p);
+
+    while (t != NULL && t->prn != p) {
+        prev = t;
+        t = t->next;
+    }
+
+    if (t == NULL) {
+        printf("Not found\n");
+        return;
+    }
+
+    if (prev == NULL)
+        head = t->next;
+    else
+        prev->next = t->next;
+
+    free(t);
+    printf("Deleted\n");
+}
+
+void sort() {
+    struct node *i, *j;
+    long p;
+    char name[30];
+
+    for (i = head; i != NULL; i = i->next) {
+        for (j = i->next; j != NULL; j = j->next) {
+            if (i->prn > j->prn) {
+                p = i->prn;
+                i->prn = j->prn;
+                j->prn = p;
+
+                strcpy(name, i->name);
+                strcpy(i->name, j->name);
+                strcpy(j->name, name);
+            }
+        }
+    }
+}
+
+void reverse() {
+    struct node *prev = NULL, *curr = head, *next;
+
+    while (curr != NULL) {
+        next = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+    }
+
+    head = prev;
+}
+
+int main() {
+    int ch;
+
+    do {
+        printf("\n1.President  2.Secretary  3.Member");
+        printf("\n4.Delete     5.Count      6.Display");
+        printf("\n7.Sort       8.Reverse    0.Exit");
+        printf("\nEnter choice: ");
+        scanf("%d", &ch);
+
+        switch (ch) {
+            case 1: addPresident(); break;
+            case 2: addSecretary(); break;
+            case 3: addMember(); break;
+            case 4: deleteNode(); break;
+            case 5: count(); break;
+            case 6: display(); break;
+            case 7: sort(); printf("Sorted\n"); break;
+            case 8: reverse(); printf("Reversed\n"); break;
+            case 0: break;
+            default: printf("Invalid choice\n");
+        }
+    } while (ch != 0);
+
+    return 0;
+}

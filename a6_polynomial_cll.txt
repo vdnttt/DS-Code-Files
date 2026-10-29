@@ -1,0 +1,130 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int coef, exp;
+    struct node *next;
+};
+
+struct node *create() {
+    struct node *head, *t, *n;
+    int i, terms;
+
+    head = malloc(sizeof(struct node));
+    head->next = head;
+
+    printf("Enter number of terms: ");
+    scanf("%d", &terms);
+
+    for (i = 0; i < terms; i++) {
+        n = malloc(sizeof(struct node));
+
+        printf("Enter coefficient and exponent: ");
+        scanf("%d%d", &n->coef, &n->exp);
+
+        t = head;
+        while (t->next != head && t->next->exp > n->exp)
+            t = t->next;
+
+        n->next = t->next;
+        t->next = n;
+    }
+
+    return head;
+}
+
+void display(struct node *head) {
+    struct node *t = head->next;
+
+    if (t == head) {
+        printf("0\n");
+        return;
+    }
+
+    while (t != head) {
+        printf("%dx^%d", t->coef, t->exp);
+        t = t->next;
+
+        if (t != head)
+            printf(" + ");
+    }
+    printf("\n");
+}
+
+int main() {
+    struct node *p1, *p2, *sum, *a, *b, *t, *n;
+
+    printf("First polynomial:\n");
+    p1 = create();
+
+    printf("Second polynomial:\n");
+    p2 = create();
+
+    printf("P1 = ");
+    display(p1);
+
+    printf("P2 = ");
+    display(p2);
+
+    sum = malloc(sizeof(struct node));
+    sum->next = sum;
+
+    a = p1->next;
+    b = p2->next;
+
+    while (a != p1 && b != p2) {
+        n = malloc(sizeof(struct node));
+
+        if (a->exp == b->exp) {
+            n->coef = a->coef + b->coef;
+            n->exp = a->exp;
+            a = a->next;
+            b = b->next;
+        } else if (a->exp > b->exp) {
+            n->coef = a->coef;
+            n->exp = a->exp;
+            a = a->next;
+        } else {
+            n->coef = b->coef;
+            n->exp = b->exp;
+            b = b->next;
+        }
+
+        t = sum;
+        while (t->next != sum)
+            t = t->next;
+
+        n->next = sum;
+        t->next = n;
+    }
+
+    while (a != p1) {
+        n = malloc(sizeof(struct node));
+        n->coef = a->coef;
+        n->exp = a->exp;
+        t = sum;
+        while (t->next != sum)
+            t = t->next;
+        n->next = sum;
+        t->next = n;
+        a = a->next;
+    }
+
+    while (b != p2) {
+        n = malloc(sizeof(struct node));
+        n->coef = b->coef;
+        n->exp = b->exp;
+        t = sum;
+        while (t->next != sum)
+            t = t->next;
+        n->next = sum;
+        t->next = n;
+        b = b->next;
+    }
+
+    printf("P1 + P2 = ");
+    display(sum);
+
+    return 0;
+}

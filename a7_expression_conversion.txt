@@ -1,0 +1,168 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+char opstack[100];
+int top = -1;
+
+char expstack[100][300];
+int st = -1;
+
+int prec(char c) {
+    if (c == '^') return 3;
+    if (c == '*' || c == '/') return 2;
+    if (c == '+' || c == '-') return 1;
+    return 0;
+}
+
+void push(char c) {
+    opstack[++top] = c;
+}
+
+char pop() {
+    return opstack[top--];
+}
+
+void spush(char s[]) {
+    strcpy(expstack[++st], s);
+}
+
+void spop(char s[]) {
+    strcpy(s, expstack[st--]);
+}
+
+void infixPostfix(char in[], char out[]) {
+    int i, k = 0;
+    char c;
+    top = -1;
+
+    for (i = 0; in[i]; i++) {
+        c = in[i];
+
+        if (isalnum(c)) out[k++] = c;
+        else if (c == '(') push(c);
+        else if (c == ')') {
+            while (top != -1 && opstack[top] != '(' )
+                out[k++] = pop();
+            pop();
+        } else {
+            while (top != -1 && opstack[top] != '(' &&
+                  (prec(opstack[top]) > prec(c) ||
+                  (prec(opstack[top]) == prec(c) && c != '^')) )
+                out[k++] = pop();
+            push(c);
+        }
+    }
+
+    while (top != -1) out[k++] = pop();
+    out[k] = '\0';
+}
+
+void postfixInfix(char in[], char out[]) {
+    int i;
+    char a[300], b[300], t[300], c[2];
+    st = -1;
+
+    for (i = 0; in[i]; i++) {
+        if (isalnum(in[i])) {
+            c[0] = in[i]; c[1] = '\0';
+            spush(c);
+        } else {
+            spop(b); spop(a);
+            sprintf(t, "(%s%c%s)", a, in[i], b);
+            spush(t);
+        }
+    }
+    spop(out);
+}
+
+void prefixInfix(char in[], char out[]) {
+    int i;
+    char a[300], b[300], t[300], c[2];
+    st = -1;
+
+    for (i = strlen(in) - 1; i >= 0; i--) {
+        if (isalnum(in[i])) {
+            c[0] = in[i]; c[1] = '\0';
+            spush(c);
+        } else {
+            spop(a); spop(b);
+            sprintf(t, "(%s%c%s)", a, in[i], b);
+            spush(t);
+        }
+    }
+    spop(out);
+}
+
+void postfixPrefix(char in[], char out[]) {
+    int i;
+    char a[300], b[300], t[300], c[2];
+    st = -1;
+
+    for (i = 0; in[i]; i++) {
+        if (isalnum(in[i])) {
+            c[0] = in[i]; c[1] = '\0';
+            spush(c);
+        } else {
+            spop(b); spop(a);
+            sprintf(t, "%c%s%s", in[i], a, b);
+            spush(t);
+        }
+    }
+    spop(out);
+}
+
+void prefixPostfix(char in[], char out[]) {
+    int i;
+    char a[300], b[300], t[300], c[2];
+    st = -1;
+
+    for (i = strlen(in) - 1; i >= 0; i--) {
+        if (isalnum(in[i])) {
+            c[0] = in[i]; c[1] = '\0';
+            spush(c);
+        } else {
+            spop(a); spop(b);
+            sprintf(t, "%s%s%c", a, b, in[i]);
+            spush(t);
+        }
+    }
+    spop(out);
+}
+
+void infixPrefix(char in[], char out[]) {
+    char post[100];
+    infixPostfix(in, post);
+    postfixPrefix(post, out);
+}
+
+int main() {
+    char in[100], out[300];
+    int ch;
+
+    do {
+        printf("\n1.Infix-Postfix  2.Infix-Prefix");
+        printf("\n3.Postfix-Infix  4.Postfix-Prefix");
+        printf("\n5.Prefix-Infix   6.Prefix-Postfix");
+        printf("\n0.Exit\nChoice: ");
+        scanf("%d", &ch);
+
+        if (ch >= 1 && ch <= 6) {
+            printf("Enter expression: ");
+            scanf("%99s", in);
+
+            switch (ch) {
+                case 1: infixPostfix(in, out); break;
+                case 2: infixPrefix(in, out); break;
+                case 3: postfixInfix(in, out); break;
+                case 4: postfixPrefix(in, out); break;
+                case 5: prefixInfix(in, out); break;
+                case 6: prefixPostfix(in, out); break;
+            }
+
+            printf("Result: %s\n", out);
+        }
+    } while (ch != 0);
+
+    return 0;
+}

@@ -1,0 +1,61 @@
+
+#include <stdio.h>
+
+int main() {
+    float a[50], bucket[10][50], temp;
+    int count[10] = {0};
+    int n, i, j, k, b, shown;
+
+    printf("Enter number of students: ");
+    scanf("%d", &n);
+
+    printf("Enter percentages:\n");
+    for (i = 0; i < n; i++)
+        scanf("%f", &a[i]);
+
+    for (i = 0; i < n; i++) {
+        b = (int)(a[i] / 10);
+
+        if (b > 9)
+            b = 9;
+
+        bucket[b][count[b]] = a[i];
+        count[b]++;
+    }
+
+    for (b = 0; b < 10; b++) {
+        for (i = 1; i < count[b]; i++) {
+            temp = bucket[b][i];
+            j = i - 1;
+
+            while (j >= 0 && bucket[b][j] > temp) {
+                bucket[b][j + 1] = bucket[b][j];
+                j--;
+            }
+
+            bucket[b][j + 1] = temp;
+        }
+    }
+
+    k = 0;
+    for (b = 0; b < 10; b++) {
+        for (i = 0; i < count[b]; i++) {
+            a[k] = bucket[b][i];
+            k++;
+        }
+    }
+
+    printf("\nSorted percentages:\n");
+    for (i = 0; i < n; i++)
+        printf("%.2f ", a[i]);
+
+    printf("\n\nTop scores:\n");
+    shown = 0;
+
+    for (i = n - 1; i >= 0 && shown < 5; i--) {
+        printf("%.2f\n", a[i]);
+        shown++;
+    }
+
+    return 0;
+}

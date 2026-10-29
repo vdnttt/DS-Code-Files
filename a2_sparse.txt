@@ -1,0 +1,75 @@
+#include <stdio.h>
+#define MAX 50
+
+int main() {
+    int a[MAX][3], b[MAX][3], c[MAX][3];
+    int r, col, x, i, j, k = 1;
+    int count[MAX] = {0}, pos[MAX];
+
+    printf("Enter rows and columns: ");
+    scanf("%d%d", &r, &col);
+
+    printf("Enter matrix elements:\n");
+    for (i = 0; i < r; i++)
+        for (j = 0; j < col; j++) {
+            scanf("%d", &x);
+            if (x != 0) {
+                a[k][0] = i;
+                a[k][1] = j;
+                a[k][2] = x;
+                k++;
+            }
+        }
+
+    a[0][0] = r;
+    a[0][1] = col;
+    a[0][2] = k - 1;
+
+    printf("\nTriplet Form:\n");
+    for (i = 0; i < k; i++)
+        printf("%d %d %d\n", a[i][0], a[i][1], a[i][2]);
+
+    /* Simple Transpose */
+    b[0][0] = col;
+    b[0][1] = r;
+    b[0][2] = a[0][2];
+    k = 1;
+
+    for (i = 0; i < col; i++)
+        for (j = 1; j <= a[0][2]; j++)
+            if (a[j][1] == i) {
+                b[k][0] = a[j][1];
+                b[k][1] = a[j][0];
+                b[k][2] = a[j][2];
+                k++;
+            }
+
+    printf("\nSimple Transpose:\n");
+    for (i = 0; i < k; i++)
+        printf("%d %d %d\n", b[i][0], b[i][1], b[i][2]);
+
+    /* Fast Transpose */
+    c[0][0] = col;
+    c[0][1] = r;
+    c[0][2] = a[0][2];
+
+    for (i = 1; i <= a[0][2]; i++)
+        count[a[i][1]]++;
+
+    pos[0] = 1;
+    for (i = 1; i < col; i++)
+        pos[i] = pos[i - 1] + count[i - 1];
+
+    for (i = 1; i <= a[0][2]; i++) {
+        j = pos[a[i][1]]++;
+        c[j][0] = a[i][1];
+        c[j][1] = a[i][0];
+        c[j][2] = a[i][2];
+    }
+
+    printf("\nFast Transpose:\n");
+    for (i = 0; i <= c[0][2]; i++)
+        printf("%d %d %d\n", c[i][0], c[i][1], c[i][2]);
+
+    return 0;
+}
